@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Bài kiểm tra đầu vào – SXHD & Hóa chất</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--teal:#0F6E56;--teal-light:#E1F5EE;--teal-mid:#1D9E75;--red:#A32D2D;--red-light:#FCEBEB;--gray-light:#F1EFE8;--border:#e0ded8;--text:#1a1a18;--text2:#5F5E5A;--white:#fff;--radius:10px;--radius-sm:6px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:var(--text);font-size:15px;line-height:1.55;min-height:100vh}
+.top-bar{background:var(--teal);color:#fff;padding:14px 18px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.top-bar-title{font-size:15px;font-weight:600}
+.top-bar-sub{font-size:11px;opacity:.8;margin-top:1px}
+#timer-wrap{background:rgba(255,255,255,.18);border-radius:var(--radius-sm);padding:5px 12px;text-align:center;min-width:60px;display:none}
+#timer{font-size:18px;font-weight:700;letter-spacing:.04em}
+#timer.urgent{color:#FAC775}
+.container{max-width:540px;margin:0 auto;padding:16px}
+.screen{display:none}.screen.active{display:block}
+.intro-card,.form-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:22px 20px;margin-bottom:14px}
+.intro-icon{width:48px;height:48px;background:var(--teal-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.intro-icon svg{width:24px;height:24px;stroke:var(--teal);fill:none;stroke-width:2}
+.intro-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.intro-desc{font-size:13px;color:var(--text2);line-height:1.7}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.meta-item{background:var(--gray-light);border-radius:var(--radius-sm);padding:9px 11px}
+.meta-item .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600;margin-bottom:3px}
+.meta-item .val{font-size:13px;font-weight:600}
+.field-group{margin-bottom:12px}
+.field-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.field-group input,.field-group select{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--white);-webkit-appearance:none;outline:none;transition:border-color .15s}
+.field-group input:focus,.field-group select:focus{border-color:var(--teal-mid)}
+.btn-primary{width:100%;padding:14px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-primary:active{opacity:.85}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.progress-track{flex:1;background:var(--border);border-radius:999px;height:5px;overflow:hidden}
+.progress-fill{height:5px;background:var(--teal-mid);border-radius:999px;transition:width .3s ease}
+.progress-label{font-size:12px;color:var(--text2);white-space:nowrap}
+.q-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:18px 16px;margin-bottom:10px}
+.q-num{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--teal-mid);margin-bottom:6px}
+.q-text{font-size:14px;font-weight:600;margin-bottom:13px;line-height:1.55}
+.opt{display:flex;align-items:flex-start;gap:11px;padding:11px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:7px;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent}
+.opt:last-child{margin-bottom:0}
+.opt-circle{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:var(--text2);background:var(--gray-light)}
+.opt-text{font-size:13px;line-height:1.45;padding-top:5px}
+.opt.selected{border-color:var(--teal-mid);background:#f0faf6}
+.opt.selected .opt-circle{background:var(--teal-mid);border-color:var(--teal-mid);color:#fff}
+.opt.correct{border-color:var(--teal);background:#e6f7f1}
+.opt.correct .opt-circle{background:var(--teal);border-color:var(--teal);color:#fff}
+.opt.wrong{border-color:var(--red);background:var(--red-light)}
+.opt.wrong .opt-circle{background:var(--red);border-color:var(--red);color:#fff}
+.opt.readonly{cursor:default;pointer-events:none}
+.submit-zone{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-top:6px;margin-bottom:24px}
+.answered-count{font-size:13px;color:var(--text2);text-align:center;margin-bottom:12px}
+.answered-count span{font-weight:700;color:var(--teal)}
+.dots-row{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:14px}
+.dot{width:26px;height:26px;border-radius:50%;background:var(--gray-light);border:1.5px solid var(--border);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;color:var(--text2)}
+.dot.done{background:var(--teal-mid);border-color:var(--teal-mid);color:#fff}
+.result-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:24px 20px;margin-bottom:12px;text-align:center}
+.score-circle{width:110px;height:110px;border-radius:50%;margin:0 auto 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid var(--teal-mid)}
+.score-circle.fail{border-color:var(--red)}
+.score-num{font-size:38px;font-weight:800;line-height:1;color:var(--teal)}
+.score-circle.fail .score-num{color:var(--red)}
+.score-unit{font-size:11px;color:var(--text2);margin-top:2px}
+.result-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 16px;border-radius:999px;font-size:13px;font-weight:700;margin-bottom:10px}
+.badge-pass{background:var(--teal-light);color:var(--teal)}
+.badge-fail{background:var(--red-light);color:var(--red)}
+.result-name{font-size:14px;font-weight:600;margin-bottom:4px}
+.result-unit{font-size:12px;color:var(--text2)}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.stat-box{background:var(--gray-light);border-radius:var(--radius-sm);padding:10px 8px;text-align:center}
+.stat-box .sv{font-size:20px;font-weight:700}
+.stat-box .sl{font-size:10px;color:var(--text2);margin-top:2px}
+.review-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:24px}
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px}
+.spinner{width:36px;height:36px;border:3px solid var(--teal-light);border-top-color:var(--teal-mid);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:var(--text2)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a18;color:#fff;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;white-space:nowrap}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div>
+    <div class="top-bar-title">Bài kiểm tra đầu vào</div>
+    <div class="top-bar-sub">SXHD · Luật Phòng bệnh · Hóa chất</div>
+  </div>
+  <div id="timer-wrap">
+    <div id="timer">15:00</div>
+    <div style="font-size:9px;opacity:.7;margin-top:1px">còn lại</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- THÔNG TIN -->
+  <div id="screen-info" class="screen active">
+    <div class="intro-card">
+      <div class="intro-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg>
+      </div>
+      <div class="intro-title">Bài đánh giá kiến thức</div>
+      <div class="intro-desc">Trắc nghiệm một lựa chọn. Đọc kỹ từng câu trước khi chọn đáp án. Bài tự nộp khi hết giờ.</div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="lbl">Số câu</div><div class="val">10 câu</div></div>
+        <div class="meta-item"><div class="lbl">Thời gian</div><div class="val">15 phút</div></div>
+        <div class="meta-item"><div class="lbl">Tổng điểm</div><div class="val">100 điểm</div></div>
+        <div class="meta-item"><div class="lbl">Điểm đạt</div><div class="val">≥ 50 điểm</div></div>
+      </div>
+    </div>
+    <div class="form-card">
+      <div class="field-group"><label>Họ và tên *</label><input id="inp-name" type="text" placeholder="Nguyễn Văn A" autocomplete="name"></div>
+      <div class="field-group"><label>Đơn vị công tác *</label><input id="inp-unit" type="text" placeholder="Trạm y tế phường..."></div>
+      <div class="field-group"><label>Đối tượng</label>
+        <select id="inp-role">
+          <option>Cán bộ tuyến xã / phường</option>
+          <option>Cán bộ tuyến tỉnh / quận / huyện</option>
+          <option>Khác</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="startQuiz()">Bắt đầu làm bài →</button>
+    </div>
+  </div>
+
+  <!-- LÀM BÀI -->
+  <div id="screen-quiz" class="screen">
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="prog-label">0 / 10</div>
+    </div>
+    <div id="questions-area"></div>
+    <div class="submit-zone">
+      <div class="answered-count">Đã trả lời: <span id="ans-count">0</span> / 10 câu</div>
+      <div class="dots-row" id="dots-row"></div>
+      <button class="btn-primary" id="submit-btn" onclick="submitQuiz()" disabled>Hoàn thành &amp; Nộp bài</button>
+    </div>
+  </div>
+
+  <!-- ĐANG GỬI -->
+  <div id="screen-submitting" class="screen">
+    <div class="loading-screen">
+      <div class="spinner"></div>
+      <div class="loading-text">Đang gửi kết quả lên hệ thống...</div>
+    </div>
+  </div>
+
+  <!-- KẾT QUẢ -->
+  <div id="screen-result" class="screen">
+    <div class="result-card" id="result-summary"></div>
+    <div class="review-card">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:12px">Xem lại đáp án từng câu</div>
+      <div id="review-area"></div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyDu-MgI9ktvxj7CZOvDQ6T0fB-5CyQtHnk",
+  authDomain:        "kiem-tra-sxhd.firebaseapp.com",
+  databaseURL:       "https://kiem-tra-sxhd-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "kiem-tra-sxhd",
+  storageBucket:     "kiem-tra-sxhd.firebasestorage.app",
+  messagingSenderId: "420667662056",
+  appId:             "1:420667662056:web:1fae35ca245d0b98d4f35d"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+window._saveResult = async (data) => {
+  await push(ref(db, "results"), { ...data, submittedAt: serverTimestamp() });
+};
+</script>
+
+<script>
+const Q = [
+  {q:"Văn bản nào thay thế Luật Phòng, chống bệnh truyền nhiễm 2007 từ ngày 01/7/2026?",
+   opts:["Luật Hóa chất 2025","Luật Phòng bệnh số 114/2025/QH15","Nghị định 91/2016/NĐ-CP","Thông tư 05/2026/TT-BYT"],ans:1},
+  {q:"Trong giai đoạn trước 01/7/2026, chế độ báo cáo bệnh truyền nhiễm chủ yếu căn cứ theo:",
+   opts:["Thông tư 54/2015/TT-BYT","Thông tư 05/2026/TT-BYT","Nghị định 342/2025/NĐ-CP","Luật khám chữa bệnh"],ans:0},
+  {q:"Muỗi truyền bệnh SXHD chủ yếu ở Việt Nam là:",
+   opts:["Anopheles dirus","Culex quinquefasciatus","Aedes aegypti","Aedes albopictus"],ans:2},
+  {q:"Khi nhận thông tin ca SXHD nghi ngờ tại cộng đồng, việc đầu tiên của trạm y tế là:",
+   opts:["Phun hóa chất toàn xã/phường ngay lập tức","Tiếp nhận, xác minh thông tin ca bệnh và địa chỉ nguy cơ","Chờ đủ 02 ca mới báo cáo","Chỉ truyền thông trên loa phát thanh"],ans:1},
+  {q:"Can thiệp nền tảng trong phòng chống SXHD là:",
+   opts:["Vắc xin dự phòng","Diệt lăng quăng/bọ gậy và loại bỏ nơi sinh sản của muỗi","Phun hóa chất hằng ngày ở mọi nơi","Cách ly người bệnh tại nhà 21 ngày"],ans:1},
+  {q:"TT 05/2026/TT-BYT liên quan trực tiếp đến nội dung nào?",
+   opts:["Danh mục hóa chất không được sử dụng và hóa chất nguy hiểm phải công bố thông tin trong chế phẩm diệt côn trùng, diệt khuẩn","Hướng dẫn chẩn đoán SXHD","Quy trình tiêm chủng mở rộng","Quy định giá dịch vụ khám bệnh"],ans:0},
+  {q:"Trường hợp vượt khả năng xã/phường, xã/phường cần:",
+   opts:["Chờ hết tháng mới báo cáo","Báo cáo cấp trên, tham mưu UBND và đề xuất hỗ trợ nguồn lực từ tuyến tỉnh","Tự ý mua hóa chất không rõ nguồn","Dừng giám sát ca mới"],ans:1},
+  {q:"Tính lượng hóa chất P 55% w/v và nước sạch cần cho phun ULV trong nhà, liều pha 5 ml dd đã pha / 50 m³, thể tích 300 m³:",
+   opts:["30 ml hóa chất và 300 ml nước sạch","30 ml hóa chất và 27 ml nước sạch","3 ml hóa chất và 30 ml nước sạch","3 ml hóa chất và 27 ml nước sạch"],ans:3},
+  {q:"Tính lượng hóa chất F 78,8 g/L hoạt chất và nước sạch cần phun ULV trong nhà, liều pha 1:100, xử lý 300 m³:",
+   opts:["5 ml hóa chất và 300 ml nước sạch","5 ml hóa chất và 150 ml nước sạch","10 ml hóa chất và 990 ml nước sạch","10 ml hóa chất và 1000 ml nước sạch"],ans:2},
+  {q:"Có thể mua 2 sản phẩm hóa chất diệt côn trùng để phối trộn tăng hiệu quả phun không?",
+   opts:["Có","Tùy thuộc loại hóa chất","Không","Không rõ"],ans:2}
+];
+
+const L = ['A','B','C','D'];
+let ua = new Array(10).fill(-1), cu = {}, tInt = null, tLeft = 900, submitted = false;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function toast(m){
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function startQuiz(){
+  const name = document.getElementById('inp-name').value.trim();
+  const unit = document.getElementById('inp-unit').value.trim();
+  if(!name){ toast('Vui lòng nhập họ tên'); return; }
+  if(!unit){ toast('Vui lòng nhập đơn vị'); return; }
+  cu = { name, unit, role: document.getElementById('inp-role').value };
+  ua = new Array(10).fill(-1); submitted = false;
+  document.getElementById('questions-area').innerHTML = Q.map((q,qi) =>
+    `<div class="q-card">
+      <div class="q-num">Câu ${qi+1} / 10</div>
+      <div class="q-text">${q.q}</div>
+      ${q.opts.map((o,oi) =>
+        `<div class="opt" id="opt-${qi}-${oi}" onclick="sel(${qi},${oi})">
+          <div class="opt-circle">${L[oi]}</div>
+          <div class="opt-text">${o}</div>
+        </div>`).join('')}
+    </div>`).join('');
+  document.getElementById('dots-row').innerHTML =
+    ua.map((_,i) => `<div class="dot" id="dot-${i}">${i+1}</div>`).join('');
+  showScreen('screen-quiz');
+  document.getElementById('timer-wrap').style.display = 'block';
+  tLeft = 900;
+  tInt = setInterval(() => {
+    tLeft--;
+    const m = Math.floor(tLeft/60), s = tLeft % 60;
+    const el = document.getElementById('timer');
+    el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    if(tLeft <= 120) el.classList.add('urgent');
+    if(tLeft <= 0){ clearInterval(tInt); submitQuiz(); }
+  }, 1000);
+}
+
+function sel(qi, oi){
+  if(submitted) return;
+  const prev = ua[qi];
+  if(prev >= 0) document.getElementById(`opt-${qi}-${prev}`).classList.remove('selected');
+  ua[qi] = oi;
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  document.getElementById(`dot-${qi}`).classList.add('done');
+  const answered = ua.filter(x => x >= 0).length;
+  document.getElementById('ans-count').textContent = answered;
+  document.getElementById('prog-fill').style.width = (answered * 10) + '%';
+  document.getElementById('prog-label').textContent = answered + ' / 10';
+  document.getElementById('submit-btn').disabled = answered < 10;
+}
+
+async function submitQuiz(){
+  if(submitted) return;
+  submitted = true;
+  clearInterval(tInt);
+  document.getElementById('timer-wrap').style.display = 'none';
+  const score  = ua.filter((a,i) => a === Q[i].ans).length * 10;
+  const now    = new Date();
+  const payload = {
+    name: cu.name, unit: cu.unit, role: cu.role,
+    score, correctCount: score / 10,
+    answers: ua.slice(),
+    timeTakenSeconds: 900 - tLeft,
+    submittedDate: now.toLocaleDateString('vi-VN'),
+    submittedTime: now.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})
+  };
+  showScreen('screen-submitting');
+  try { if(window._saveResult) await window._saveResult(payload); } catch(e){ console.warn(e); }
+  showResult(payload);
+}
+
+function showResult(d){
+  const pass = d.score >= 50;
+  const ms = Math.floor(d.timeTakenSeconds/60), ss = d.timeTakenSeconds % 60;
+  document.getElementById('result-summary').innerHTML =
+    `<div class="score-circle${pass?'':' fail'}">
+      <div class="score-num">${d.score}</div>
+      <div class="score-unit">điểm / 100</div>
+    </div>
+    <div class="result-badge ${pass?'badge-pass':'badge-fail'}">${pass?'✓ ĐẠT':'✗ CHƯA ĐẠT'}</div>
+    <div class="result-name">${d.name}</div>
+    <div class="result-unit">${d.unit}</div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="sv">${d.correctCount}/10</div><div class="sl">Câu đúng</div></div>
+      <div class="stat-box"><div class="sv">${ms}:${String(ss).padStart(2,'0')}</div><div class="sl">Thời gian</div></div>
+      <div class="stat-box"><div class="sv">${d.submittedTime}</div><div class="sl">Nộp lúc</div></div>
+    </div>`;
+  let rev = '';
+  Q.forEach((q,i) => {
+    const ua2 = d.answers[i], ca = q.ans, ok = (ua2 === ca);
+    rev += `<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f1efe8">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:${ok?'#1D9E75':'#A32D2D'};margin-bottom:5px">
+        Câu ${i+1} — ${ok?'✓ Đúng':'✗ Sai'}
+      </div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:9px;line-height:1.5">${q.q}</div>
+      ${q.opts.map((o,oi) => {
+        let cls = 'opt readonly' + (oi===ca?' correct':oi===ua2&&ua2!==ca?' wrong':'');
+        return `<div class="${cls}" style="margin-bottom:5px">
+          <div class="opt-circle">${L[oi]}</div>
+          <div class="opt-text" style="font-size:12px">${o}
+            ${oi===ca?'<strong style="color:#0F6E56"> ← Đáp án đúng</strong>':''}
+            ${oi===ua2&&ua2!==ca?'<strong style="color:#A32D2D"> ← Bạn chọn</strong>':''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  });
+  document.getElementById('review-area').innerHTML = rev;
+  showScreen('screen-result');
+}
+</script>
+</body>
+</html>
